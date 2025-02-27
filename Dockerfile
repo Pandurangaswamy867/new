@@ -1,7 +1,17 @@
-FROM node:18
+# Use a lightweight Python image
+FROM python:3.9.6-slim-buster
+
+# Set the working directory
 WORKDIR /app
-COPY package.json package-lock.json ./
-RUN npm install
-COPY . .
-EXPOSE 8080  # <--- Ensure the correct port is exposed
-CMD ["node", "server.js"]
+
+# Copy application files
+ADD . /app
+
+# Install dependencies
+RUN pip install --no-cache-dir -r requirements.txt
+
+# Expose the application port
+EXPOSE 2000
+
+# Run the Flask app with Gunicorn
+CMD ["gunicorn", "-b", "0.0.0.0:2000", "app:app"]
