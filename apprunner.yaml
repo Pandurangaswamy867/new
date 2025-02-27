@@ -5,6 +5,6 @@ build:
     - pip install --no-cache-dir --upgrade pip
     - pip install --no-cache-dir -r requirements.txt
 run:
-  command: "gunicorn -b 0.0.0.0:2000 app:app"
+  command: gunicorn -b 0.0.0.0:2000 app:app
   network:
     port: 2000
