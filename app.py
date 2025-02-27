@@ -54,10 +54,14 @@ HTML_TEMPLATE = """
             box-shadow: 2px 2px 8px rgba(255, 255, 255, 0.1);
             display: flex;
             align-items: center;
+            transition: background 0.3s ease;
         }
         .step i {
             font-size: 1.5rem;
             margin-right: 10px;
+        }
+        .step:hover {
+            background-color: #50507a;
         }
         button {
             padding: 10px 20px;
@@ -68,9 +72,24 @@ HTML_TEMPLATE = """
             border-radius: 5px;
             cursor: pointer;
             transition: background 0.3s;
+            margin-top: 20px;
         }
         button:hover {
             background-color: #e6b800;
+        }
+        .progress-container {
+            width: 60%;
+            margin: 20px auto;
+            background-color: #3a3a5a;
+            border-radius: 10px;
+            overflow: hidden;
+            box-shadow: 2px 2px 10px rgba(255, 255, 255, 0.2);
+        }
+        .progress-bar {
+            width: 0%;
+            height: 20px;
+            background-color: #ffcc00;
+            transition: width 0.5s ease;
         }
         .footer {
             margin-top: 30px;
@@ -86,12 +105,16 @@ HTML_TEMPLATE = """
         
         <div class="flowchart">
             <h2>📌 Deployment Flowchart:</h2>
-            <div class="step"><i class="fab fa-github"></i> Step 1: Code from GitHub Repo</div>
-            <div class="step"><i class="fas fa-server"></i> Step 2: AWS App Runner Deploys App</div>
-            <div class="step"><i class="fas fa-shield-alt"></i> Step 3: Protected by AWS WAF</div>
-            <div class="step"><i class="fas fa-sitemap"></i> Step 4: Routing via Route 53</div>
-            <div class="step"><i class="fas fa-chart-line"></i> Step 5: Observability with CloudWatch</div>
-            <div class="step"><i class="fas fa-check-circle"></i> Step 6: Scalable & Running 🚀</div>
+            <div class="step" onclick="updateProgress(16.6)"><i class="fab fa-github"></i> Step 1: Code from GitHub Repo</div>
+            <div class="step" onclick="updateProgress(33.2)"><i class="fas fa-server"></i> Step 2: AWS App Runner Deploys App</div>
+            <div class="step" onclick="updateProgress(49.8)"><i class="fas fa-shield-alt"></i> Step 3: Protected by AWS WAF</div>
+            <div class="step" onclick="updateProgress(66.4)"><i class="fas fa-sitemap"></i> Step 4: Routing via Route 53</div>
+            <div class="step" onclick="updateProgress(83.0)"><i class="fas fa-chart-line"></i> Step 5: Observability with CloudWatch</div>
+            <div class="step" onclick="updateProgress(100)"><i class="fas fa-check-circle"></i> Step 6: Scalable & Running 🚀</div>
+        </div>
+        
+        <div class="progress-container">
+            <div class="progress-bar" id="progressBar"></div>
         </div>
 
         <button onclick="animateIcons()">Click to Animate</button>
@@ -108,6 +131,10 @@ HTML_TEMPLATE = """
                 icon.style.transform = "rotate(360deg)";
                 setTimeout(() => icon.style.transform = "rotate(0deg)", 500);
             });
+        }
+        
+        function updateProgress(value) {
+            document.getElementById("progressBar").style.width = value + "%";
         }
     </script>
 </body>
