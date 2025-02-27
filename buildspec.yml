@@ -1,4 +1,0 @@
-version: 1.0
-runtime: nodejs18
-instanceConfiguration:
-  port: 8080  # <--- Specify the port

@@ -1,0 +1,9 @@
+version: 1.0
+runtime: python3.9
+build:
+  commands:
+    - pip install -r requirements.txt
+run:
+  command: "gunicorn -b 0.0.0.0:2000 app:app"
+  network:
+    port: 2000
