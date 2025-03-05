@@ -23,4 +23,5 @@ jobs:
 
       - name: Trigger App Runner Deployment
         run: |
-          aws apprunner start-deployment --service-arn arn:aws:apprunner:us-east-1:321435669766:service/mech
+          aws apprunner start-deployment --service-arn arn:aws:apprunner:us-east-1:149914652348:service/APP-RUNNER-SERVICE-PANDU/ed718127271a48deb44ae67d2dbe86d2
+
