@@ -1,5 +1,7 @@
 flask
 gunicorn
 mysql-connector-python
-
-
+opentelemetry-sdk
+opentelemetry-exporter-otlp
+opentelemetry-instrumentation-flask
+opentelemetry-instrumentation-mysql
