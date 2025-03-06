@@ -1,26 +1,21 @@
-FROM python:3
+# Use official Python image
+FROM python:3.9
 
-# Set the working directory
+# Set working directory
 WORKDIR /app
 
-# Copy all application files to the container
+# Copy application files
 COPY . /app
 
 # Install dependencies
 RUN pip install --no-cache-dir -r requirements.txt
 
-# Install AWS X-Ray daemon
-RUN apt-get update && \
-    apt-get install -y unzip && \
-    curl -o /tmp/xray-daemon.deb https://s3.amazonaws.com/aws-xray-daemon/linux/latest/xray-daemon-3.x86_64.rpm && \
-    dpkg -i /tmp/xray-daemon.deb
+# Download & install AWS X-Ray daemon
+RUN curl -o /usr/local/bin/xray-daemon https://s3.amazonaws.com/aws-xray-assets.us-east-1/xray-daemon-linux-3.x86_64 && \
+    chmod +x /usr/local/bin/xray-daemon
 
-# Expose the ports for the application and X-Ray daemon
+# Expose necessary ports
 EXPOSE 2000 2000/udp
 
-# Set environment variables for X-Ray
-ENV AWS_XRAY_DAEMON_ADDRESS=127.0.0.1:2000
-ENV AWS_XRAY_CONTEXT_MISSING=LOG_ERROR
-
-# Start X-Ray daemon in the background and run the Flask app
-CMD ["/bin/sh", "-c", "xray -o & gunicorn -b 0.0.0.0:2000 app:app"]
+# Start X-Ray Daemon and Gunicorn
+CMD ["/usr/local/bin/xray-daemon", "-o", "127.0.0.1:2000", "--log-level", "debug"] & gunicorn -b 0.0.0.0:2000 app:app
