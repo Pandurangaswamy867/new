@@ -1,4 +1,4 @@
-# Use an official Python runtime as a parent image
+# Use an official Python runtime as a parent image 
 FROM python:3.9
 
 # Set the working directory in the container
@@ -8,7 +8,8 @@ WORKDIR /app
 COPY . /app
 
 # Install dependencies
-RUN pip install --no-cache-dir -r requirements.txt
+RUN pip install --no-cache-dir --upgrade pip \
+    && pip install --no-cache-dir -r requirements.txt
 
 # Expose the correct port
 EXPOSE 2000
@@ -18,6 +19,7 @@ ENV FLASK_APP=app.py
 ENV FLASK_RUN_HOST=0.0.0.0
 ENV FLASK_RUN_PORT=2000
 
-# Command to run the app using Gunicorn
-CMD ["gunicorn", "-b", "0.0.0.0:2000", "app:app"]
+# Command to run the app using Gunicorn with multiple workers
+CMD ["gunicorn", "--bind", "0.0.0.0:2000", "--workers", "4", "app:app"]
+
 
