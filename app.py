@@ -1,4 +1,4 @@
-from flask import Flask, request, jsonify, render_template_string
+from flask import Flask, request, jsonify, render_template
 import mysql.connector
 import os
 import boto3
@@ -27,7 +27,7 @@ def get_db_credentials():
             "host": secret["host"],
             "user": secret["username"],
             "password": secret["password"],
-            "database": secret["dbname"],
+            "database": secret.get("dbname", "hotel_db"),
             "port": int(secret.get("port", 3306)),
         }
     except Exception as e:
@@ -71,34 +71,20 @@ create_tables()
 
 @app.route("/")
 def home():
-    return render_template_string("""
-    <h1>Welcome to the Hotel App</h1>
-    <a href='/add'>Add Room</a> | <a href='/room-list'>Room List</a>
-    """)
+    return render_template("index.html")
 
 @app.route("/add")
 def add():
-    return render_template_string("""
-    <h1>Add a New Room</h1>
-    <form action='/create' method='POST'>
-        <label>Room Name:</label>
-        <input type='text' name='name' required>
-        <label>Capacity:</label>
-        <input type='number' name='capacity' required>
-        <button type='submit'>Add Room</button>
-    </form>
-    """)
+    return render_template("add_room.html")
 
 @app.route("/create", methods=["POST"])
 def create():
-    name = request.form.get("name")
-    capacity = request.form.get("capacity")
+    data = request.get_json()
+    name = data.get("name")
+    capacity = data.get("capacity")
     connection = get_db_connection()
     if connection is None:
-        return render_template_string("""
-        <h1>Error</h1>
-        <p>Could not connect to the database.</p>
-        """)
+        return jsonify({"error": "Database connection failed"}), 500
     cursor = connection.cursor()
     try:
         cursor.execute("INSERT INTO rooms (name, capacity) VALUES (%s, %s)", (name, capacity))
@@ -108,49 +94,19 @@ def create():
     finally:
         cursor.close()
         connection.close()
-    return render_template_string("""
-    <h1>Room Successfully Created</h1>
-    <a href='/'>Go Back</a>
-    """)
-
-@app.route("/error")
-def error():
-    return render_template_string("""
-    <h1>An Error Occurred</h1>
-    <p>Something went wrong. Please try again later.</p>
-    <a href='/'>Go Back</a>
-    """)
-
-@app.route("/param-list")
-def param_list():
-    return render_template_string("""
-    <h1>Application Parameters</h1>
-    <p>Database Host: {{ db_host }}</p>
-    <p>Database Name: {{ db_name }}</p>
-    """, db_host=DB_CONFIG["host"], db_name=DB_CONFIG["database"])
+    return jsonify({"message": "Room added successfully"})
 
 @app.route("/room-list")
 def room_list():
     connection = get_db_connection()
     if connection is None:
-        return render_template_string("""
-        <h1>Error</h1>
-        <p>Could not connect to the database.</p>
-        """)
+        return jsonify({"error": "Database connection failed"}), 500
     cursor = connection.cursor(dictionary=True)
     cursor.execute("SELECT name, capacity FROM rooms")
     rooms = cursor.fetchall()
     cursor.close()
     connection.close()
-    return render_template_string("""
-    <h1>List of Rooms</h1>
-    <ul>
-        {% for room in rooms %}
-            <li>{{ room.name }} - Capacity: {{ room.capacity }}</li>
-        {% endfor %}
-    </ul>
-    <a href='/'>Go Back</a>
-    """, rooms=rooms)
+    return jsonify(rooms)
 
 if __name__ == "__main__":
     app.run(debug=True, host="0.0.0.0", port=2000)
