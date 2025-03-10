@@ -13,20 +13,25 @@ xray_recorder.configure(service='MyFlaskApp')
 XRayMiddleware(app, xray_recorder)
 
 # Fetch database credentials from AWS Secrets Manager
-def get_db_credentials():
-    secret_name = "AppRunnerHotelDBSecret"  # Replace with your actual secret name
-    region_name = "us-east-1"  # Replace with your AWS region
 
+def get_db_credentials():
+    secret_arn = os.getenv("DB_SECRET")  # ARN of the secret
+    region_name = "us-east-1"  # Set your AWS region
+    
+    if not secret_arn:
+        print("DB_SECRET environment variable not set.")
+        return None
+    
     session = boto3.session.Session()
     client = session.client(service_name='secretsmanager', region_name=region_name)
     
     try:
-        get_secret_value_response = client.get_secret_value(SecretId=secret_name)
+        get_secret_value_response = client.get_secret_value(SecretId=secret_arn)
         secret = json.loads(get_secret_value_response['SecretString'])
         return {
-            "host": secret["host"],
-            "user": secret["username"],
-            "password": secret["password"],
+            "host": secret.get("host"),
+            "user": secret.get("username"),
+            "password": secret.get("password"),
             "database": secret.get("dbname", "hotel_db"),
             "port": int(secret.get("port", 3306)),
         }
