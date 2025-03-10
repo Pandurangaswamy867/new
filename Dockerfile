@@ -1,21 +1,22 @@
-# Use official Python image
+# Use an official Python runtime as a parent image
 FROM python:3.9
 
-# Set working directory
+# Set the working directory in the container
 WORKDIR /app
 
-# Copy application files
+# Copy the current directory contents into the container at /app
 COPY . /app
 
 # Install dependencies
 RUN pip install --no-cache-dir -r requirements.txt
 
-# Download & install AWS X-Ray daemon
-RUN curl -o /usr/local/bin/xray-daemon https://s3.amazonaws.com/aws-xray-assets.us-east-1/xray-daemon-linux-3.x86_64 && \
-    chmod +x /usr/local/bin/xray-daemon
+# Expose the correct port
+EXPOSE 2000
 
-# Expose necessary ports
-EXPOSE 2000 2000/udp
+# Define environment variables
+ENV FLASK_APP=app.py
+ENV FLASK_RUN_HOST=0.0.0.0
+ENV FLASK_RUN_PORT=2000
 
-# Start X-Ray Daemon and Gunicorn
-CMD ["/usr/local/bin/xray-daemon", "-o", "127.0.0.1:2000", "--log-level", "debug"] & gunicorn -b 0.0.0.0:2000 app:app
+# Command to run the app
+CMD ["flask", "run", "--host=0.0.0.0", "--port=2000"]
