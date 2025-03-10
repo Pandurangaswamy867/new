@@ -18,5 +18,6 @@ ENV FLASK_APP=app.py
 ENV FLASK_RUN_HOST=0.0.0.0
 ENV FLASK_RUN_PORT=2000
 
-# Command to run the app
-CMD ["flask", "run", "--host=0.0.0.0", "--port=2000"]
+# Command to run the app using Gunicorn
+CMD ["gunicorn", "-b", "0.0.0.0:2000", "app:app"]
+
