@@ -1,4 +1,5 @@
-Flask
+flask
 mysql-connector-python
 boto3
 aws-xray-sdk
+gunicorn
